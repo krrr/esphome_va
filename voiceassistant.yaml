@@ -19,7 +19,7 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: ""
+    key: "AEw4BcWHmN3ci1LlLEzRHtxla+VSsKqtne4FjJdoMeg="
 
 
 
@@ -50,22 +50,22 @@ media_player:
   announcement_pipeline:
     speaker: speaker_id
   buffer_size: 1000000
-  on_announcement:
-    - if:
-        condition:
-          - microphone.is_capturing:
-        then:
-          - script.execute: stop_wake_word
-    - light.turn_on:
-        id: led
-        blue: 0%
-        red: 0%
-        green: 100%
-        brightness: 100%
-        effect: none
-  on_idle:
-    - script.execute: start_wake_word
-    - script.execute: reset_led
+  #on_announcement:
+  #  - if:
+  #      condition:
+  #        - microphone.is_capturing:
+  #      then:
+  #        - script.execute: stop_wake_word
+  #  - light.turn_on:
+  #      id: led
+  #      blue: 100%
+  #      red: 0%
+  #      green: 0%
+  #      brightness: 70%
+  #      effect: none
+  #on_idle:
+  #  - script.execute: start_wake_word
+  #  - script.execute: reset_led
   files:
     - id: notify_sound
       file: "https://github.com/krrr/esphome_va/raw/main/sounds/notify.wav"
@@ -117,6 +117,8 @@ voice_assistant:
   use_wake_word: false  # because using micro wake word
   noise_suppression_level: 2
   auto_gain: 22dBFS
+  on_start:
+    - script.execute: stop_wake_word
   on_listening:
     - light.turn_on:
         id: led
@@ -152,7 +154,7 @@ voice_assistant:
                 voice_assistant.is_running:
             - not:
                 speaker.is_playing:
-    - micro_wake_word.start:
+    - script.execute: start_wake_word
     - script.execute: reset_led
   on_error:
     - light.turn_on:
