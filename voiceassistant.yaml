@@ -19,7 +19,7 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "AEw4BcWHmN3ci1LlLEzRHtxla+VSsKqtne4FjJdoMeg="
+    key: ""
 
 
 
@@ -189,7 +189,7 @@ micro_wake_word:
 
 ota:
   - platform: esphome
-    password: "7ce354dfdc270e2653d4b76714202ff7"
+    password: ""
 
 wifi:
   ssid: !secret wifi_ssid
