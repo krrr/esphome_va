@@ -1,6 +1,6 @@
-#ESPHome Voice Assistant
+# ESPHome Voice Assistant
 
-##部件清单
+## 部件清单
 - 单片机：ESP32-S3-N16R8（20元
 - 喇叭：淘宝买的圆形4Ω3W的1.5寸，带腔体，屁股还带一个被动振膜（9元
 - 功放：MAX98357模块（3元
