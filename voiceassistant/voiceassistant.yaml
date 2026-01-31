@@ -19,7 +19,7 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: ""
+    key: "AEw4BcWHmN3ci1LlLEzRHtxla+VSsKqtne4FjJdoMeg="
 
 
 
@@ -116,7 +116,7 @@ voice_assistant:
   micro_wake_word:  # Configuring this allows Home Assistant to change which wake word model is enabled
   use_wake_word: false  # because using micro wake word
   noise_suppression_level: 2
-  auto_gain: 22dBFS
+  auto_gain: 31dBFS  # voice volume
   on_start:
     - script.execute: stop_wake_word
   on_listening:
@@ -202,10 +202,25 @@ wifi:
 
 captive_portal:
 
+i2c:
+  sda: GPIO09
+  scl: GPIO10
+  scan: true
+  id: bus_a
+
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal"
     update_interval: 60s
+
+  - platform: aht10
+    variant: AHT20
+    temperature:
+      name: "Temperature"
+    humidity:
+      name: "Humidity"
+    update_interval: 60s
+
 
 script:
   - id: reset_led

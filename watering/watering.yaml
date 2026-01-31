@@ -1,0 +1,104 @@
+substitutions:
+ devicename: "watering"
+ friendly_name: "浇花器"
+ # 引脚定义
+ pin_relay: GPIO26      # 水泵继电器
+ pin_dht: GPIO27        # 温湿度
+ pin_soil: GPIO34       # 土壤检测 (ADC)
+
+
+esphome:
+ name: ${devicename}
+ friendly_name: "浇花器"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  flash_size: 16MB
+  cpu_frequency: 240MHZ
+  framework:
+    type: esp-idf
+    
+ota:
+  - platform: esphome
+    password: ""
+    
+wifi:
+ ssid: !secret wifi_ssid
+ password: !secret wifi_password
+ ap:
+   ssid: "${devicename}-fallback"
+   password: "123456789"
+
+logger:
+api:
+ota:
+
+# ------------------------------------------------
+# 传感器 (仅显示数据)
+# ------------------------------------------------
+sensor:
+ # 1. 温湿度
+ - platform: dht
+   pin: ${pin_dht}
+   temperature:
+     name: "温度"
+   humidity:
+     name: "湿度"
+   model: DHT22
+   update_interval: 60s
+
+ # 2. 土壤传感器
+ # 初始状态：输出电压值 (V)。方便你先观察读数。
+ # 等你确定了干湿数值后，取消下方 'filters' 的注释即可变回百分比。
+ - platform: adc
+   pin: ${pin_soil}
+   name: " 土壤数据"
+   id: soil_sensor
+   update_interval: 5s
+   attenuation: 11db
+   
+   # --- 校准区域 (使用前请取消注释并填入你的数值) ---
+   # unit_of_measurement: "%"
+   # filters:
+   #   - sliding_window_moving_average:
+   #       window_size: 10
+   #       send_every: 5
+   #   - calibrate_linear:
+   #       # 格式: 读到的电压 -> 显示的百分比
+   #       - 2.80 -> 0.0   # 空气中 (干)
+   #       - 1.10 -> 100.0 # 水中 (湿)
+   #   - lambda: |
+   #       if (x < 0) return 0;
+   #       if (x > 100) return 100;
+   #       return x;
+
+# ------------------------------------------------
+# 手动控制配置
+# ------------------------------------------------
+
+# 这是一个滑动条，让你在HA里设置“手动浇水持续几秒”
+# 比如设为5秒，那你点开关后，泵工作5秒自动停。
+number:
+ - platform: template
+   name: "单次浇水时长"
+   id: manual_duration
+   optimistic: true
+   min_value: 1
+   max_value: 60   # 最长允许设定60秒
+   step: 1
+   initial_value: 5
+   unit_of_measurement: "s"
+   mode: box
+
+switch:
+ - platform: gpio
+   pin: ${pin_relay}
+   name: " 手动浇水"
+   id: relay_switch
+   icon: "mdi:water-pump"
+   
+   # 核心逻辑：开启时，读取上面的时长设置，倒计时结束后自动关
+   on_turn_on:
+     - logger.log: "手动浇水已触发"
+     - delay: !lambda 'return id(manual_duration).state * 1000;'
+     - switch.turn_off: relay_switch
