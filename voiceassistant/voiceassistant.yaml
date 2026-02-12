@@ -19,7 +19,7 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "AEw4BcWHmN3ci1LlLEzRHtxla+VSsKqtne4FjJdoMeg="
+    key: !secret ha_key
 
 
 
@@ -68,7 +68,7 @@ media_player:
   #  - script.execute: reset_led
   files:
     - id: notify_sound
-      file: "https://github.com/krrr/esphome_va/raw/main/sounds/notify.wav"
+      file: "https://github.com/krrr/esphome_va/raw/main/voiceassistant/sounds/notify.wav"
 
 
 ###### microphone
@@ -189,7 +189,7 @@ micro_wake_word:
 
 ota:
   - platform: esphome
-    password: ""
+    password: !secret ota_password
 
 wifi:
   ssid: !secret wifi_ssid
